@@ -2,16 +2,20 @@
 # game
 # board
 # player
+
+#store code and guesses as arrays
 class Game
+
 
   def initialize(code_length = 4, code_base = 6)
     #@code_maker = code_maker
     #@code_breaker = code_breaker
     
     @code_length = code_length
-    @code_base = code_base
+    @code_base = code_base     #number of possible elements in code
+    @guesses = []
 
-    board = Board.new(pegs, code_length)
+    #board = Board.new(code_length, code_base)
   end
 
   def start
@@ -21,57 +25,95 @@ class Game
     puts "Codemaker please make ur code"
 
     #
-    @code = gets.chomp
-    code.split!
+    input = gets.chomp
+    @code = input.split("")
 
+    #while code not guessed and tries not exceeded
     puts "OK now other guy guess code"
-    @guess = gets.chomp
-    @guesses.push  @guess.split
+    puts "Format: 'ABCD' if guess ABCD"
+    input = gets.chomp
+    guess = input.split("")
+    @guesses.push(guess)
+
+    guess_result = check_guess(guess)
 
     #compare code and guess and return key pegs
+    if guess_result[:all_correct] = code_length
+      #game over with win
+    end
 
+    #show 
   end
 
   private
 
-  def check_guess
-    @return_hash = {all_correct: 0, position_only: 0}
-    @code.split.each do  |i|
-      if @guess[i] == code[i]
-        @return_hash[all_correct] += 1
-      elsif @code.include?(guess[i])
-        #something else
+  def check_guess(guess)
+    code_temp = @code
+    # puts "code_temp = #{code_temp}"
+    # puts "guess = #{guess}"
+    
+    return_hash = {all_correct: 0, position_only: 0}
+    
+    correct = 0
+    @code.length.times do |i|
+      # puts "i = #{i}"
+      # puts "code_temp_length = #{code_temp.length}"
+
+
+      # p guess[i]
+      # p code_temp[i]
+      # p return_hash[:all_correct]
+      if guess[i-correct] == code_temp[i-correct]
+        return_hash[:all_correct] += 1
+        code_temp.delete_at(i-correct)
+        guess.delete_at(i-correct)
+        correct += 1
+      end
+      
+      puts "code_temp = #{code_temp}"
+      puts "guess = #{guess}"
+      p return_hash
+      puts
+    end
+    code_temp.each_with_index do  |x, i|
+      if guess.include?(x)
+        guess.delete(x)
+        code_temp[i] = " "
+        puts "match found"
+        
+        return_hash[:position_only] += 1
+
+
       end
     end
 
-
-    #return hash of 
+    
+    puts return_hash
+    return return_hash
   end
 
   def draw_board
-    guesses.each 
+    @guesses.each do |x|
+      puts x
+    end
   end
-
-
 end
 
 
 
-
-
-class Board
+# class Board
   
 
-  def initialize(pegs, code_length)
-    @pegs = pegs
-    @code_length = code_length
+#   def initialize(pegs, code_length)
+#     @pegs = pegs
+#     @code_length = code_length
 
-  end
+#   end
 
-  def show
-  end
+#   def show
+#   end
 
+# end
 
-
-end
-
+game = Game.new
+game.start
