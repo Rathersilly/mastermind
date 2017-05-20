@@ -10,6 +10,17 @@ class Game
   MAX_TRIES = 4
 
   def initialize(code_length = 4, code_base = 6)
+    puts "Welcome to MASTERMIND"
+    puts "Please choose to be the:"
+    puts "1 : Code Maker"
+    puts "2 : Code Breaker"
+    puts "3 : Both (Debugger)"
+    input = gets.chomp.to_i
+    @human_role = :maker if input == 1
+    @human_role = :breaker if input == 2
+    @human_role = :debugger if input == 3
+    puts "You are the Code " << @human_role.to_s.capitalize << "."
+
     #@code_maker = code_maker
     #@code_breaker = code_breaker
     
@@ -25,15 +36,11 @@ class Game
   def start
     #which player is the codemaker and which is the codebreaker
     #by default player1 makes and player2 breaks
-
-    puts "Codemaker please make ur code"
-
-    #
-    input = gets.chomp
-    @code = input.split("")     #code is an array of strings
-
+    get_code
+    guess_result = Hash.new
+    code_broken = false
     #while code not guessed and tries not exceeded
-    while @tries < MAX_TRIES
+    while @tries < MAX_TRIES && code_broken == false
       puts "OK now other guy guess code"
       puts "Format: 'ABCD' if guess ABCD"
       input = gets.chomp
@@ -51,16 +58,36 @@ class Game
 
       
       if guess_result[:all_correct] == @code_length
-        puts "WIN"
-        #game over with win
+        code_broken = true
+        puts "CODE GUESSED!"
+        puts "You rule!" if @human_role == :breaker
+        puts "You suck!" if @human_role == :maker
+        puts "It's a tie!" if @human_role == :debugger      
       end
     end
-
+    if code_broken == false
+      puts "code intact"
+    end
 
     #show 
   end
 
   private
+  def get_code
+    if @human_role == :maker || @human_role == :debugger
+      puts "\nCodemaker please make ur code"
+
+      input = gets.chomp
+      @code = input.split("")     #code is an array of strings
+
+
+
+    else
+      #ai makes code
+    end
+
+  end
+
 
   def check_guess(guess)
     code_temp = @code.dup
