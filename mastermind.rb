@@ -26,6 +26,7 @@ class Game
     
     @code_length = code_length
     @code_base = code_base     #number of possible elements in code
+    @code = []
     @guesses = []
     @returns = []
     @tries = 0
@@ -41,21 +42,13 @@ class Game
     code_broken = false
     #while code not guessed and tries not exceeded
     while @tries < MAX_TRIES && code_broken == false
-      puts "OK now other guy guess code"
-      puts "Format: 'ABCD' if guess ABCD"
-      input = gets.chomp
-      guess = input.split("")     #guess is an array
-      #puts guess
-      @guesses.push(guess)        #@guesses is an array of arrays of strings
-      
-      #puts "@guesses: #{@guesses}"
-      @tries += 1
 
+      guess = get_guess
+      sleep 0.5
       guess_result = check_guess(guess)
       @returns.push(guess_result)
 
       draw_board
-
       
       if guess_result[:all_correct] == @code_length
         code_broken = true
@@ -66,28 +59,53 @@ class Game
       end
     end
     if code_broken == false
-      puts "code intact"
+      puts "CODE INTACT!"
+      puts "Great codemaking!" if @human_role == :maker
+      puts "Bad human!" if @human_role == :breaker
+      puts "It's a tie!" if @human_role == :debugger
     end
 
     #show 
   end
 
   private
-  def get_code
+
+  def get_code 
     if @human_role == :maker || @human_role == :debugger
       puts "\nCodemaker please make ur code"
-
       input = gets.chomp
       @code = input.split("")     #code is an array of strings
-
-
-
     else
-      #ai makes code
+      @code_length.times do |i|
+        @code.push rand(1..@code_base).to_s
+      end
+      puts @code.inspect
     end
-
   end
 
+  def get_guess
+    guess = []
+    if @human_role == :breaker || @human_role == :debugger
+
+      puts "OK human plz guess code"
+      #puts "Format: 'ABCD' if guess ABCD"
+      input = gets.chomp
+      guess = input.split("")     #guess is an array
+
+    else
+      #computer guesses randomly
+      @code_length.times do |i|
+        guess.push rand(1..6).to_s
+      end
+
+    end
+
+    @guesses.push(guess)        #@guesses is an array of arrays of strings
+    @tries += 1
+    #puts guess.inspect
+    return guess
+
+  end
 
   def check_guess(guess)
     code_temp = @code.dup
@@ -142,12 +160,14 @@ class Game
   end
 
   def draw_board
-    puts "X" * @code_length + "\tall_correct\tposition_only"
-    
-    @guesses.each_with_index do |x, i|
-      print x.join + "\t#{@returns[i][:all_correct]}\t\t#{@returns[i][:position_only]}"
-      puts
-    end
+    puts "X" * @code_length + "\tall_correct\tposition_only" if @tries == 1
+     
+    #@guesses.each_with_index do |x, i|
+    #  print x.join + "\t#{@returns[i][:all_correct]}\t\t#{@returns[i][:position_only]}"
+    #  puts
+    #end
+
+    print @guesses[@tries - 1].join + "\t#{@returns[@tries - 1][:all_correct]}\t\t#{@returns[@tries - 1][:position_only]}"
     puts
   end
 end

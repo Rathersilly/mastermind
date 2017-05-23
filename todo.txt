@@ -1,0 +1,6 @@
+the odin project - mastermind - todo list
+
+
+can refactor win text to use ternary operators or something more dry
+
+gotta add some ai eventually
